@@ -1,49 +1,62 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  async function handleLogin(event){
-    event.preventDefault();
-    try{
-        const token = await axios.post("http://localhost:3001/api/auth/login",{userName,password})
-        console.log(token);
-        alert("Login Successful")
-    } catch (e){
-        console.log("Login Error", e);
-        alert("Invalid Cred")
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("https://springboot-ems-backend-3.onrender.com/api/auth/login", {
+        username: userName,
+        password: password,
+      });
+      console.log("Login Success", res.data);
+      alert("Login Successful");
+    } catch (error) {
+      console.error("Login Failed", error);
+      alert("Login Failed");
     }
-    console.log("Form Submitted");
-  }
+  };
+
   return (
-    <div>
-      <h2>Login</h2>
-      <div>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%" }}>
+        <h2 className="text-center mb-4">Login</h2>
         <form onSubmit={handleLogin}>
-          <label htmlFor="userName">User Name</label>
-          <input
-            id="userName"
-            name="userName"
-            value={userName}
-            type="text"
-            onChange={(e) => setUserName(e.target.value)}
-          />
-          <br /> <br />
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            value={password}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <br />
-          <br />
-          <button type="submit">Login</button><br /><br />
+          <div className="mb-3">
+            <label htmlFor="userName" className="form-label">Username</label>
+            <input
+              id="userName"
+              type="text"
+              className="form-control"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input
+              id="password"
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-primary w-100" Link to="/Empdetails">Login</button>
         </form>
+        <p className="mt-3 text-center">
+          Don&apos;t have an account? <Link to="/signup">Sign up</Link>
+        </p>
       </div>
     </div>
   );
 };
+
 export default Login;
