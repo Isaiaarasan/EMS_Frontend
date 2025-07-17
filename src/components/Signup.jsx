@@ -1,123 +1,143 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const Signupform = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [rolename, setRoleName] = useState(""); // single value, not array
+const Register = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    userName: "",
+    password: "",
+    roleNames: []
+  });
 
-  const handleRoleChange = (e) => {
-    setRoleName(e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "roleNames") {
+      const roles = value === "both" ? ["user", "admin"] : [value];
+      setForm({ ...form, roleNames: roles });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
-  const handleSignup = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "https://springboot-ems-backend-3.onrender.com/api/auth/register",
-        {
-          name,
-          email,
-          password,
-          username,
-          rolenames: rolename ? [rolename] : [], // send as array
-        }
-      );
-      console.log("Signup Success", response.data);
-      alert("Signup Successful");
+      await axios.post("http://localhost:10000/api/auth/register", form);
+      alert("Registered Successfully!");
+      setForm({
+        name: "",
+        email: "",
+        userName: "",
+        password: "",
+        roleNames: []
+      });
     } catch (error) {
-      console.error("Signup Error", error);
-      alert("Signup Failed. Please try again.");
+      console.error("Registration Error", error);
+      alert("Error while registering");
     }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-100">
-      <div className="card shadow p-4" style={{ maxWidth: "500px", width: "100%" }}>
-        <h2 className="text-center mb-4">Signup</h2>
-        <form onSubmit={handleSignup}>
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{ background: "linear-gradient(90deg, #74c0fc, #b197fc)" }}
+    >
+      <div className="bg-white p-4 rounded shadow" style={{ width: "400px" }}>
+        <h2 className="text-center text-danger mb-4">Register</h2>
+        <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label htmlFor="name" className="form-label">Employee Name</label>
+            <label htmlFor="name" className="form-label">
+              Full Name
+            </label>
             <input
               type="text"
-              id="name"
               className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={form.name}
+              onChange={handleChange}
               required
             />
           </div>
+
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
               type="email"
-              id="email"
               className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={form.email}
+              onChange={handleChange}
               required
             />
           </div>
+
           <div className="mb-3">
-            <label htmlFor="username" className="form-label">Username</label>
+            <label htmlFor="userName" className="form-label">
+              User Name
+            </label>
             <input
               type="text"
-              id="username"
               className="form-control"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="userName"
+              value={form.userName}
+              onChange={handleChange}
               required
             />
           </div>
+
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password</label>
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <input
               type="password"
-              id="password"
               className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
               required
             />
           </div>
-          <fieldset className="mb-3 border p-3 rounded">
-            <legend className="fs-6">Select Roles</legend>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                value="ROLE_ADMIN"
-                id="adminRole"
-                checked={rolename === "ROLE_ADMIN"}
-                onChange={handleRoleChange}
-                required
-              />
-              <label className="form-check-label" htmlFor="adminRole">Admin</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                value="ROLE_USER"
-                id="userRole"
-                checked={rolename === "ROLE_USER"}
-                onChange={handleRoleChange}
-                required
-              />
-              <label className="form-check-label" htmlFor="userRole">User</label>
-            </div>
-          </fieldset>
-          <button type="submit" className="btn btn-primary w-100">Signup</button>
+
+          <div className="mb-4">
+            <label htmlFor="roleNames" className="form-label">
+              Role
+            </label>
+            <select
+              className="form-select"
+              name="roleNames"
+              value={
+                form.roleNames.length > 1
+                  ? "both"
+                  : form.roleNames[0] || ""
+              }
+              onChange={handleChange}
+              required
+            >
+              <option value="" disabled>Select a role</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="btn w-100 fw-bold text-white"
+            style={{
+              background: "linear-gradient(90deg, #74c0fc, #b197fc)",
+            }}
+          >
+            Register
+          </button>
         </form>
-        <p className="mt-3 text-center">
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
       </div>
     </div>
   );
 };
 
-export default Signupform;
+export default Register;
